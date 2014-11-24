@@ -4,11 +4,9 @@ package io.ivy.lambdacraft;
 import javax.script.*;
 
 import net.canarymod.Canary;
-
 import net.canarymod.commandsys.CommandListener;
 import net.canarymod.plugin.Plugin;
 import net.canarymod.plugin.PluginListener;
-
 import net.canarymod.commandsys.Command;
 import net.canarymod.commandsys.CommandListener;
 import net.canarymod.chat.MessageReceiver;
@@ -26,6 +24,7 @@ public class LambdaCraft extends Plugin implements PluginListener, CommandListen
         // TODO Auto-generated method stub
 
         getLogman().info("Attempting to register the interpreter.");
+        getLogman().info("This normally takes a few seconds.");
 
 
         ScriptEngineManager script_manager = new ScriptEngineManager();
@@ -33,9 +32,16 @@ public class LambdaCraft extends Plugin implements PluginListener, CommandListen
         lisp_engine = script_manager.getEngineByExtension("lisp");
 
         if (lisp_engine != null) {
-            getLogman().info("Looks good so far...");
+            getLogman().info("loaded!");
         }
-        getLogman().info(lisp_engine.get("*package*"));
+        
+        try {
+        	lisp_engine.eval("(load \"lisp/tools.lisp\")");
+			getLogman().info((String)lisp_engine.eval("(lambdacraft-banner)"));
+		} catch (ScriptException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
         
         try {
             Canary.commands().registerCommands(this, this, false);
@@ -64,9 +70,12 @@ public class LambdaCraft extends Plugin implements PluginListener, CommandListen
     public void evalCommand( MessageReceiver sender, String[] args) {
         String player_name = sender.getName();
 
-        LispObject response = interop.eval(args[1]);
-
-        sender.notice(response.toString());
+        try {
+			sender.notice((String)lisp_engine.eval("(lambdacraft-banner)"));
+		} catch (ScriptException e) {
+			// TODO Auto-generated catch block
+			sender.notice(e.toString());
+		}
     }
 }
 
