@@ -1,0 +1,4 @@
+main-class = io.ivy.lambdacraft.LambdaCraft
+name = LambdaCraft
+author = cmoore
+version = 1
