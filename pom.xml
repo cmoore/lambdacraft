@@ -19,7 +19,13 @@
 	</dependency>
   </dependencies>
   <build>
-   <resources>
+    <resources>
+      <resource>
+        <directory>.</directory>
+        <includes>
+          <include>boot.lisp</include>
+        </includes>
+      </resource>
   	<resource>
   		<directory>.</directory>
   		<includes>

@@ -3,14 +3,19 @@ package io.ivy.lambdacraft;
 
 import javax.script.*;
 
-import net.canarymod.Canary;
-import net.canarymod.commandsys.CommandListener;
 import net.canarymod.plugin.Plugin;
 import net.canarymod.plugin.PluginListener;
-import net.canarymod.commandsys.Command;
-import net.canarymod.commandsys.CommandListener;
+import net.canarymod.tasks.ServerTask;
+import net.canarymod.tasks.TaskOwner;
+import net.canarymod.commandsys.*;
 import net.canarymod.chat.MessageReceiver;
-import net.canarymod.commandsys.CommandDependencyException;
+import net.canarymod.Canary;
+import net.canarymod.api.inventory.recipes.CraftingRecipe;
+import net.canarymod.api.inventory.recipes.RecipeRow;
+import net.canarymod.api.inventory.Item;
+import net.canarymod.hook.Dispatcher;
+import net.canarymod.plugin.PluginListener;
+import net.canarymod.hook.Hook;
 
 import org.armedbear.lisp.*;
 import org.armedbear.lisp.scripting.*;
@@ -36,12 +41,16 @@ public class LambdaCraft extends Plugin implements PluginListener, CommandListen
         }
         
         try {
-        	lisp_engine.eval("(load \"lisp/tools.lisp\")");
-			getLogman().info((String)lisp_engine.eval("(lambdacraft-banner)"));
-		} catch (ScriptException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		}
+            Invocable inv (Invocable) this.lisp_engine;
+            InputStreamReader reader = new InputStreamReader(getClass()
+                                                             .getClassLoader()
+                                                             .getResourceAsStream("boot.lisp"));
+            this.lisp_engine.eval(reader);
+       
+        } catch (ScriptException e1) {
+            // TODO Auto-generated catch block
+            e1.printStackTrace();
+        }
         
         try {
             Canary.commands().registerCommands(this, this, false);
@@ -57,7 +66,54 @@ public class LambdaCraft extends Plugin implements PluginListener, CommandListen
         // TODO Auto-generated method stub
     }
 
+    public static interface IDispatcher {
+        public void execute(PluginListener listener, Hook hook);
+    }
+    
+    public Dispatcher getDispatcher(final IDispatcher impl) {
+        return new Dispatcher() {
+            public void execute(PluginListener listener, Hook hook) {
+                impl.execute(listener, hook);
+            }
+        };
+    }
 
+    public class LambdaCraftTask extends ServerTask {
+        private Runnable runnable = null;
+        public LambdaCraftTask(Runnable runnable, TaskOwner owner, long delay, boolean continuous) {
+            super(owner, delay, continuous);
+            this.runnable = runnable;
+        }
+        @Override
+        public void run() {
+            this.runnable.run();
+        }
+    }
+
+    public ServerTask createServerTask(Runnable runnable, long delay, boolean continuous) {
+        return new LambdaCraftTask(runnable, this, delay, continuous);
+    }
+
+    public void executeCommand( MessageReceiver sender, String[] args) {
+        boolean result = false;
+        String lisp_code = "";
+        Object lisp_result = null;
+
+        try {
+            lisp_result = ((Invocable) this.lisp_engine).invokeFunction("__onCommand", sender, args);
+        } catch (Exception se) {
+            this.getLogman().error(se.toString());
+            se.printStackTrace();
+            sender.message(se.getMessage());
+        }
+
+        if (lisp_result != null) {
+            return;
+        }
+        return;
+    }
+    
+                                                            
 
     /* Commands */
 
@@ -71,11 +127,11 @@ public class LambdaCraft extends Plugin implements PluginListener, CommandListen
         String player_name = sender.getName();
 
         try {
-			sender.notice((String)lisp_engine.eval("(lambdacraft-banner)"));
-		} catch (ScriptException e) {
-			// TODO Auto-generated catch block
-			sender.notice(e.toString());
-		}
+            sender.notice((String)lisp_engine.eval("(lambdacraft-banner)"));
+        } catch (ScriptException e) {
+            // TODO Auto-generated catch block
+            sender.notice(e.toString());
+        }
     }
 }
 
