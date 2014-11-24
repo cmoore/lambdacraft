@@ -10,7 +10,7 @@
 (defun boot ()
   (Canary.log.info "Booting..."))
 
-(defun lambdacraft-banner ()
+(defun banner ()
   "LambdaCraft explode-your-server edition!")
 
 
@@ -18,3 +18,6 @@
   (do-all-symbols (sym pack)
     (when (eql (symbol-package sym) pack)
       (export sym))))
+
+(defun welcome (plugin engine classloader)
+	(describe plugin))

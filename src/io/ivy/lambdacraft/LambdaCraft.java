@@ -1,6 +1,8 @@
 
 package io.ivy.lambdacraft;
 
+import java.io.InputStreamReader;
+
 import javax.script.*;
 
 import net.canarymod.plugin.Plugin;
@@ -37,20 +39,25 @@ public class LambdaCraft extends Plugin implements PluginListener, CommandListen
         lisp_engine = script_manager.getEngineByExtension("lisp");
 
         if (lisp_engine != null) {
-            getLogman().info("loaded!");
+            getLogman().info("Engine created.");
         }
         
         try {
-            Invocable inv (Invocable) this.lisp_engine;
+            Invocable inv = (Invocable) this.lisp_engine;
             InputStreamReader reader = new InputStreamReader(getClass()
                                                              .getClassLoader()
                                                              .getResourceAsStream("boot.lisp"));
             this.lisp_engine.eval(reader);
+            getLogman().info(this.lisp_engine.eval("(lcraft:banner)"));
+            getLogman().info(inv.invokeFunction("lcraft:welcome", this, lisp_engine, getClass().getClassLoader()));
        
         } catch (ScriptException e1) {
             // TODO Auto-generated catch block
             e1.printStackTrace();
-        }
+        } catch (NoSuchMethodException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
         
         try {
             Canary.commands().registerCommands(this, this, false);
