@@ -1,23 +1,17 @@
 
-
-(defpackage :lcraft
-  (:use :common-lisp)
-  (:export :boot))
-
-
-(in-package #:lcraft)
-
-(defun boot ()
-  (Canary.log.info "Booting..."))
+(require 'java)
 
 (defun banner ()
   "LambdaCraft explode-your-server edition!")
 
+(defvar *logger* nil)
 
-(let ((pack (find-package :lcraft)))
-  (do-all-symbols (sym pack)
-    (when (eql (symbol-package sym) pack)
-      (export sym))))
+(defun startup (lcraft engine loader)
+  (load "lisp/pkg.lisp")
+  (let ((logman-instance (jcall "getLogman" lcraft)))
+    (setf *logger* logman-instance)))
 
-(defun welcome (plugin engine classloader)
-	(describe plugin))
+(defun command-line (sender args)
+  (let ((command (svref args 1)))
+    (jcall "info" *logger* (concatenate 'string "C: " command))
+    (eval (read-from-string command))))

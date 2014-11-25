@@ -41,23 +41,22 @@ public class LambdaCraft extends Plugin implements PluginListener, CommandListen
         if (lisp_engine != null) {
             getLogman().info("Engine created.");
         }
-        
         try {
             Invocable inv = (Invocable) this.lisp_engine;
             InputStreamReader reader = new InputStreamReader(getClass()
                                                              .getClassLoader()
                                                              .getResourceAsStream("boot.lisp"));
             this.lisp_engine.eval(reader);
-            getLogman().info(this.lisp_engine.eval("(lcraft:banner)"));
-            getLogman().info(inv.invokeFunction("lcraft:welcome", this, lisp_engine, getClass().getClassLoader()));
-       
+            
+            getLogman().info(this.lisp_engine.eval("(banner)"));
+            inv.invokeFunction("startup", this, lisp_engine, getClass().getClassLoader());
+
+        } catch (NoSuchMethodException e) {
+            e.printStackTrace();
         } catch (ScriptException e1) {
             // TODO Auto-generated catch block
             e1.printStackTrace();
-        } catch (NoSuchMethodException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+        }
         
         try {
             Canary.commands().registerCommands(this, this, false);
@@ -107,20 +106,19 @@ public class LambdaCraft extends Plugin implements PluginListener, CommandListen
         Object lisp_result = null;
 
         try {
-            lisp_result = ((Invocable) this.lisp_engine).invokeFunction("__onCommand", sender, args);
+            lisp_result = ((Invocable) this.lisp_engine).invokeFunction("command-line", sender, args);
         } catch (Exception se) {
-            this.getLogman().error(se.toString());
             se.printStackTrace();
-            sender.message(se.getMessage());
         }
 
         if (lisp_result != null) {
+            sender.notice(lisp_result.toString());
             return;
         }
         return;
     }
     
-                                                            
+    
 
     /* Commands */
 
@@ -131,14 +129,7 @@ public class LambdaCraft extends Plugin implements PluginListener, CommandListen
               toolTip = "/eval <lisp expression>",
               min = 1)
     public void evalCommand( MessageReceiver sender, String[] args) {
-        String player_name = sender.getName();
-
-        try {
-            sender.notice((String)lisp_engine.eval("(lambdacraft-banner)"));
-        } catch (ScriptException e) {
-            // TODO Auto-generated catch block
-            sender.notice(e.toString());
-        }
+        executeCommand(sender, args);
     }
 }
 
