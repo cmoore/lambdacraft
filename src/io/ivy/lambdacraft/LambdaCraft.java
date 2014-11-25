@@ -42,6 +42,7 @@ public class LambdaCraft extends Plugin implements PluginListener, CommandListen
             getLogman().info("Engine created.");
         }
         try {
+            
             Invocable inv = (Invocable) this.lisp_engine;
             InputStreamReader reader = new InputStreamReader(getClass()
                                                              .getClassLoader()
@@ -49,6 +50,8 @@ public class LambdaCraft extends Plugin implements PluginListener, CommandListen
             this.lisp_engine.eval(reader);
             
             getLogman().info(this.lisp_engine.eval("(banner)"));
+
+            getLogman().info("Loading environment.  This will take a while.");
             inv.invokeFunction("startup", this, lisp_engine, getClass().getClassLoader());
 
         } catch (NoSuchMethodException e) {

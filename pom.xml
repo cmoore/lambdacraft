@@ -35,27 +35,42 @@
   </resources>
   <sourceDirectory>src</sourceDirectory>
   <plugins>
-      <plugin>
-     <groupId>org.apache.maven.plugins</groupId>
-     <artifactId>maven-shade-plugin</artifactId>
-     <version>2.0</version>
-     <executions>
-       <execution>
-         <phase>package</phase>
-         <goals>
-           <goal>shade</goal>
-         </goals>
-         <configuration>
-           <finalName>tracker-shade</finalName>
-           <!-- <outputFile>c:\users\cmoore\desktop\ich_bin_minecraft\vigo\plugins\${project.artifactId}.jar</outputFile> -->
-           <outputFile>../../vigo/plugins/${project.artifactId}.jar</outputFile>
-           <shadedArtifactAttached>false</shadedArtifactAttached>
-           <shadedClassifierName>shaded</shadedClassifierName>
-         </configuration>
-       </execution>
-     </executions>
-   </plugin>
-  
+
+    <!--
+    <plugin>
+      <groupId>org.apache.maven.plugins</groupId>
+      <artifactId>maven-jar-plugin</artifactId>
+      <version>2.5</version>
+      <executions><execution><phase>install</phase></execution></executions>
+      <configuration>
+        <outputDirectory>../../vigo/plugins/</outputDirectory>
+      </configuration>
+    </plugin>
+    -->
+    
+   
+    <plugin>
+      <groupId>org.apache.maven.plugins</groupId>
+      <artifactId>maven-shade-plugin</artifactId>
+      <version>2.0</version>
+      <executions>
+        <execution>
+          <phase>package</phase>
+          <goals>
+            <goal>shade</goal>
+          </goals>
+          <configuration>
+            <finalName>tracker-shade</finalName>
+            <!-- <outputFile>c:\users\cmoore\desktop\ich_bin_minecraft\vigo\plugins\${project.artifactId}.jar</outputFile> -->
+            <outputFile>../../vigo/plugins/${project.artifactId}.jar</outputFile>
+            <shadedArtifactAttached>false</shadedArtifactAttached>
+            <shadedClassifierName>shaded</shadedClassifierName>
+          </configuration>
+        </execution>
+      </executions>
+    </plugin>
+   
+    
     <plugin>
       <artifactId>maven-compiler-plugin</artifactId>
       <version>3.1</version>
